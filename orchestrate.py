@@ -222,7 +222,8 @@ def main():
     tornado.options.parse_command_line()
     opts = tornado.options.options
     
-    app_log.info("Container config: {}".format(opts.container_config))
+    if opts.container_config:
+        app_log.info("Container config: {}".format(opts.container_config))
 
     handlers = [
         (r"/", LoadingHandler),
@@ -230,7 +231,7 @@ def main():
         (r"/(user-\w+)/.*", LoadingHandler),
     ]
 
-    proxy_token = os.environ['CONFIGPROXY_AUTH_TOKEN']
+    proxy_token = os.environ.get('CONFIGPROXY_AUTH_TOKEN', '')
     proxy_endpoint = os.environ.get('CONFIGPROXY_ENDPOINT', "http://127.0.0.1:8001")
     docker_host = os.environ.get('DOCKER_HOST', 'unix://var/run/docker.sock')
     
