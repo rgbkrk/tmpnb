@@ -222,7 +222,7 @@ def main():
     tornado.options.parse_command_line()
     opts = tornado.options.options
     
-    app_log.info("Container config: {}".format(container_config))
+    app_log.info("Container config: {}".format(opts.container_config))
 
     handlers = [
         (r"/", LoadingHandler),
