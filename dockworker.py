@@ -13,6 +13,10 @@ from tornado.httpclient import HTTPRequest, HTTPError, AsyncHTTPClient
 
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
+def read_container_config(path):
+    with open(path) as config_json:
+        return json.load(json_data)
+
 class AsyncDockerClient():
     '''Completely ridiculous wrapper for a Docker client that returns futures
     on every single docker method called on it, configured with an executor.
@@ -38,7 +42,7 @@ class AsyncDockerClient():
             return self.executor.submit(fn, *args, **kwargs)
 
         return method
-        
+
 
 class DockerSpawner():
     def __init__(self, docker_host='unix://var/run/docker.sock',

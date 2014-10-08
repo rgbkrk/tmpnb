@@ -27,7 +27,7 @@ from tornado.httputil import url_concat
 from tornado.httpclient import HTTPRequest, HTTPError, AsyncHTTPClient
 
 import dockworker
-from dockworker import cull_idle, AsyncDockerClient
+from dockworker import cull_idle, AsyncDockerClient, read_container_config
 
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
@@ -213,9 +213,16 @@ def main():
     tornado.options.define('redirect_uri', default="/tree",
         help="URI to redirect users to upon initial notebook launch"
     )
+    
+    tornado.options.define('container_config', type=str,
+        help="path to container configuration",
+        callback=lambda path: read_container_config(path)
+    )
 
     tornado.options.parse_command_line()
     opts = tornado.options.options
+    
+    app_log.info("Container config: {}".format(container_config))
 
     handlers = [
         (r"/", LoadingHandler),
