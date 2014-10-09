@@ -215,15 +215,15 @@ def main():
     )
     
     tornado.options.define('container_config', type=str,
-        help="path to container configuration",
-        callback=lambda path: read_container_config(path)
+        help="path to container configuration"
     )
 
     tornado.options.parse_command_line()
     opts = tornado.options.options
     
     if opts.container_config:
-        app_log.info("Container config: {}".format(opts.container_config))
+        container_config = read_container_config(opts.container_config)
+        app_log.info("Container config: {}".format(container_config))
 
     handlers = [
         (r"/", LoadingHandler),
