@@ -46,6 +46,10 @@ class SpawnHandler(RequestHandler):
     @gen.coroutine
     def get(self, path=None):
         '''Spawns a brand new server'''
+        
+        route = self.uri.path
+        app_log.info(route)
+        
         if path is None:
             # no path, use random prefix
             prefix = "user-" + sample_with_replacement(string.ascii_letters +
@@ -55,11 +59,7 @@ class SpawnHandler(RequestHandler):
 
         self.write("Initializing {}".format(prefix))
 
-        container_id, ip, port = yield self.spawner.create_notebook_server(prefix,
-                image=self.image, ipython_executable=self.ipython_executable,
-                mem_limit=self.mem_limit, cpu_shares=self.cpu_shares,
-                container_ip=self.container_ip,
-                container_port=self.container_port)
+        container_id, ip, port = yield self.spawner.create_notebook_server(prefix, self.docker_config)
 
         app_log.debug(ip, port, prefix, container_id)
         yield self.proxy(ip, port, prefix, container_id)
@@ -156,8 +156,8 @@ class SpawnHandler(RequestHandler):
         return self.settings['redirect_uri']
         
     @property
-    def docker_config(self):
-        return self.settings['docker_config']  
+    def container_config(self):
+        return self.settings['container_config']  
 
 def main():
     tornado.options.define('cull_timeout', default=3600,
@@ -187,7 +187,7 @@ def main():
     
     handlers = [
         (r"/", LoadingHandler),
-        (r"/spawn/?(/.+)?", SpawnHandler),
+        #(r"/spawn/?(/.+)?", SpawnHandler),
         (r"/(user-\w+)/.*", LoadingHandler),
     ]
 
@@ -214,16 +214,10 @@ def main():
         debug=True,
         spawner=spawner,
         autoescape=None,
-        container_ip = opts.container_ip,
-        container_port = opts.container_port,
-        ipython_executable = opts.ipython_executable,
         proxy_token=proxy_token,
         template_path=os.path.join(os.path.dirname(__file__), 'templates'),
         proxy_endpoint=proxy_endpoint,
-        mem_limit=opts.mem_limit,
-        cpu_shares=opts.cpu_shares,
-        image=opts.image,
-        redirect_uri=opts.redirect_uri,
+        container_config=container_config,
     )
     
     # check for idle containers and cull them
