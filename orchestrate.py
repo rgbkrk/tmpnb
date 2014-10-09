@@ -44,9 +44,12 @@ class LoadingHandler(RequestHandler):
 class SpawnHandler(RequestHandler):
 
     @gen.coroutine
-    def get(self, path=None):
+    def get(self):
         '''Spawns a brand new server'''
-        if path is None:
+        
+        path = self.request.query_arguments['redirect']
+        
+        if not path:
             # no path, use random prefix
             prefix = "user-" + sample_with_replacement(string.ascii_letters +
                                                        string.digits)
