@@ -15,7 +15,7 @@ AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 def read_container_config(path):
     with open(path) as config_json:
-        return json.load(json_data)
+        return json.load(config_json)
 
 class AsyncDockerClient():
     '''Completely ridiculous wrapper for a Docker client that returns futures
