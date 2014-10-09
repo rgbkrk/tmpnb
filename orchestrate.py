@@ -150,47 +150,18 @@ class SpawnHandler(RequestHandler):
     @property
     def proxy_endpoint(self):
         return self.settings['proxy_endpoint']
-
-    @property
-    def container_ip(self):
-        return self.settings['container_ip']
-
-    @property
-    def container_port(self):
-        return self.settings['container_port']
-
-    @property
-    def mem_limit(self):
-        return self.settings['mem_limit']
-
-    @property
-    def cpu_shares(self):
-        return self.settings['cpu_shares']
-
-    @property
-    def image(self):
-        return self.settings['image']
-
-    @property
-    def ipython_executable(self):
-        return self.settings['ipython_executable']
         
     @property
     def redirect_uri(self):
         return self.settings['redirect_uri']
+        
+    @property
+    def docker_config(self):
+        return self.settings['docker_config']  
 
 def main():
     tornado.options.define('cull_timeout', default=3600,
         help="Timeout (s) for culling idle"
-    )
-    tornado.options.define('container_ip', default='127.0.0.1',
-        help="IP address for containers to bind to"
-    )
-    tornado.options.define('container_port', default='8888',
-        help="Port for containers to bind to"
-    )
-    tornado.options.define('ipython_executable', default='ipython3',
-        help="IPython Notebook startup (e.g. ipython, ipython2, ipython3)"
     )
     tornado.options.define('port', default=9999,
         help="port for the main server to listen on"
@@ -198,22 +169,12 @@ def main():
     tornado.options.define('max_dock_workers', default=24,
         help="Maximum number of docker workers"
     )
-    tornado.options.define('mem_limit', default="512m",
-        help="Limit on Memory, per container"
-    )
-    tornado.options.define('cpu_shares', default=None,
-        help="Limit CPU shares, per container"
-    )
-    tornado.options.define('image', default="jupyter/demo",
-        help="Docker container to spawn for new users. Must be on the system already"
-    )
     tornado.options.define('docker_version', default="1.13",
         help="Version of the Docker API to use"
     )
     tornado.options.define('redirect_uri', default="/tree",
         help="URI to redirect users to upon initial notebook launch"
     )
-    
     tornado.options.define('container_config', type=str,
         help="path to container configuration"
     )
@@ -221,10 +182,9 @@ def main():
     tornado.options.parse_command_line()
     opts = tornado.options.options
     
-    if opts.container_config:
-        container_config = read_container_config(opts.container_config)
-        app_log.info("Container config: {}".format(container_config))
-
+    container_config = read_container_config(opts.container_config)
+    app_log.info("Container config: {}".format(container_config))
+    
     handlers = [
         (r"/", LoadingHandler),
         (r"/spawn/?(/.+)?", SpawnHandler),

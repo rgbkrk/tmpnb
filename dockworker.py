@@ -1,3 +1,25 @@
+'''
+The Dock Worker for tmpnb. Everything Docker related for tmpnb.
+
+Container Configuration
+-----------------------
+
+Example:
+
+{
+  "/default": {
+    "redirect-uri": "/notebooks/Welcome.ipynb",
+    "docker-config": {
+      "image": "jupyter/tmpnb",
+      "port": 8888,
+      "mem_limit": "512m"
+    }
+  }
+}
+
+'''
+
+
 import datetime
 import json
 
@@ -61,7 +83,7 @@ class DockerSpawner():
         self.docker_client = async_docker_client
 
     @gen.coroutine
-    def create_notebook_server(self, base_path,
+    def create_notebook_server(self, base_path, 
                                image="jupyter/demo",
                                ipython_executable="ipython3",
                                mem_limit="512m",
